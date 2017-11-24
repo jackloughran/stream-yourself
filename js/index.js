@@ -1,9 +1,27 @@
-var ap = new APlayer({
-  music: {                                                           // Required, music info, see: ###With playlist
-            title: 'Preparation',                                          // Required, music title
-            author: 'Hans Zimmer/Richard Harvey',                          // Required, music author
-            url: 'http://7xifn9.com1.z0.glb.clouddn.com/Preparation.mp3',  // Required, music url
-            pic: 'http://7xifn9.com1.z0.glb.clouddn.com/Preparation.jpg',  // Optional, music picture
-        }
-});
+var xhr = new XMLHttpRequest({mozSystem: true});
+xhr.open("GET", "http://localhost:48001/api/list", true)
+xhr.onload = function (e) {
+  if (xhr.readyState === 4) {
+    if (xhr.status === 200) {
+      var song = JSON.parse(xhr.responseText);
+      makePlayer(song);
+    } else {
+      console.error(xhr.statusText);
+    }
+  }
+};
+xhr.onerror = function (e) {
+  console.error(xhr.statusText);
+};
+xhr.send(null);
 
+function makePlayer(songs) {
+  console.log("Song: " + songs[0].loc)
+  var ap = new APlayer({
+    music: {                                                           // Required, music info, see: ###With playlist
+              title: songs[0].title,                                          // Required, music title
+              author: songs[0].artist,                          // Required, music author
+              url: songs[0].loc,  // Required, music url
+          }
+  });
+}
