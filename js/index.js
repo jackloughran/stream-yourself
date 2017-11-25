@@ -86,14 +86,10 @@ function populatePlayer(titleMap, artist) {
   titleMap.forEach(function (value, key) {
     music.push({
       title: key,
-      artist: '',
+      author: artist,
       url: value
     })
   })
 
-  for (var i = 0; i < music.length; i++) {
-    music[i].artist = artist
-  }
-
-  ap.addMusic(music)
+  ap.setMusic(music)
 }
