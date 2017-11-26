@@ -1,0 +1,55 @@
+/*--------------------*\
+#MUSIC-LIST
+\*--------------------*/
+
+.music-list {
+  list-style-type: none;
+}
+
+.music-list__artist-item {
+  cursor: default;
+  font-weight: bold;
+}
+
+.music-list__album-item {
+  cursor: default;
+  font-weight: normal;
+}
+
+
+
+
+/*--------------------*\
+#HEADERS
+\*--------------------*/
+
+.main-header {
+  font-variant: small-caps;
+}
+
+
+
+
+
+/*--------------------*\
+#LAYOUT
+\*--------------------*/
+
+.container {
+  width: 900px;
+}
+
+
+
+
+
+/*--------------------*\
+#SHARED
+\*--------------------*/
+
+.disable-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

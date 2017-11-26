@@ -27,13 +27,23 @@ function listArtists(songs) {
 
   artistMap.forEach(function (value, key, map) {
     var li = document.createElement('li');
-    li.innerHTML = key;
+    li.className = "music-list  music-list__artist-item  disable-select"
+    var span = document.createElement('span')
+    span.innerHTML = key;
 
-    var clickFunction = function () {
-      populateAlbums(li, value, key)
-      li.removeEventListener('click', clickFunction)
+    var collapseFunction = function () {
+      span.removeChild(li.lastChild)
+      span.removeEventListener('click', collapseFunction)
+      span.addEventListener('click', expandFunction)
     }
-    li.addEventListener('click', clickFunction);
+
+    var expandFunction = function () {
+      populateAlbums(li, value, key)
+      span.removeEventListener('click', expandFunction)
+      span.addEventListener('click', collapseFunction)
+    }
+    span.addEventListener('click', expandFunction);
+    li.appendChild(span)
 
     app.appendChild(li);
   });
@@ -66,6 +76,7 @@ function populateAlbums(element, albumMap, artist) {
   var ul = document.createElement('ul');
   albumMap.forEach(function (value, key) {
     var li = document.createElement('li');
+    li.className = "music-list  music-list__album-item disable-select"
 
     li.innerHTML = key
 
@@ -81,7 +92,6 @@ function populateAlbums(element, albumMap, artist) {
 }
 
 function populatePlayer(titleMap, artist) {
-  console.log(artist)
   var music = []
   titleMap.forEach(function (value, key) {
     music.push({
@@ -91,5 +101,8 @@ function populatePlayer(titleMap, artist) {
     })
   })
 
-  ap.setMusic(music)
+  var ap = new APlayer({
+    autoplay: true,
+    music: music
+  });
 }
