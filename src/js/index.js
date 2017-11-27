@@ -105,4 +105,17 @@ function populatePlayer(titleMap, artist) {
     autoplay: true,
     music: music
   });
+
+  ap.on('playing', updateTitle(ap.playIndex, titleMap))
+}
+
+function updateTitle(playIndex, titleMap) {
+  var count = 0
+  titleMap.forEach(function (value, key) {
+    if (count === playIndex) {
+      document.title = key
+    }
+
+    count++
+  })
 }
