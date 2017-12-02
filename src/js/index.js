@@ -3,7 +3,7 @@ var ap = new APlayer({
 });
 
 var xhr = new XMLHttpRequest({mozSystem: true});
-xhr.open("GET", "http://localhost:48001/api/list", true)
+xhr.open("GET", "http://138.197.172.114:48001/api/list", true)
 xhr.onload = function (e) {
   if (xhr.readyState === 4) {
     if (xhr.status === 200) {
