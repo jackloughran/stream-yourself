@@ -53,17 +53,17 @@ function parseSongs(songs) {
   var artistMap = new Map();
   for (var i = 0; i < songs.length; i++) {
     if (artistMap.get(songs[i].artist) === undefined) {
-      var titleMap = new Map([[songs[i].title, songs[i].loc]]);
+      var titleMap = new Map([[songs[i].title, [songs[i].loc, songs[i].coverArt]]]);
       var albumMap = new Map([[songs[i].album, titleMap]]);
       artistMap.set(songs[i].artist, albumMap);
     } else {
       var albumMap = artistMap.get(songs[i].artist);
       if (albumMap.get(songs[i].album) === undefined) {
-        var titleMap = new Map([[songs[i].title, songs[i].loc]]);
+        var titleMap = new Map([[songs[i].title, [songs[i].loc, songs[i].coverArt]]]);
         albumMap.set(songs[i].album, titleMap);
       } else {
         var titleMap = albumMap.get(songs[i].album);
-        titleMap.set(songs[i].title, songs[i].loc);
+        titleMap.set(songs[i].title, [songs[i].loc, songs[i].coverArt]);
         albumMap.set(songs[i].album, titleMap);
       }
     }
@@ -76,12 +76,12 @@ function populateAlbums(element, albumMap, artist) {
   var ul = document.createElement('ul');
   albumMap.forEach(function (value, key) {
     var li = document.createElement('li');
-    li.className = "music-list  music-list__album-item disable-select"
+    li.className = "music-list  music-list__album-item  disable-select"
 
     li.innerHTML = key
 
     var clickFunction = function () {
-      populatePlayer(value, artist)
+      populatePlayer(value, artist, key)
       li.removeEventListener('click', clickFunction)
     }
     li.addEventListener('click', clickFunction)
@@ -91,13 +91,14 @@ function populateAlbums(element, albumMap, artist) {
   element.appendChild(ul)
 }
 
-function populatePlayer(titleMap, artist) {
+function populatePlayer(titleMap, artist, album) {
   var music = []
   titleMap.forEach(function (value, key) {
     music.push({
       title: key,
       author: artist,
-      url: value
+      url: value[0],
+      pic: value[1]
     })
   })
 
@@ -106,16 +107,21 @@ function populatePlayer(titleMap, artist) {
     music: music
   });
 
-  ap.on('playing', updateTitle(ap.playIndex, titleMap))
-}
+  ap.on('play', function () {
+    count = 0
+    titleMap.forEach(function (value, title) {
+      if (count == ap.playIndex) {
+        document.title = title + " - " + artist + " - " + album
 
-function updateTitle(playIndex, titleMap) {
-  var count = 0
-  titleMap.forEach(function (value, key) {
-    if (count === playIndex) {
-      document.title = key
-    }
+        // stack overflow code to change favicon
+        var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = value[1];
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
 
-    count++
+      count++
+    })
   })
 }
