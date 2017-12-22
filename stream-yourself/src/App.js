@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import LoadingIcon from './Rolling.svg';
-import Play from './media-play.svg';
 import './App.css';
 
 class App extends Component {
@@ -28,16 +27,44 @@ class App extends Component {
     return (
       <div>
         { !music
-          ? <center><img src={LoadingIcon} /></center>
-          : <Player
+          ? <center><img src={LoadingIcon} alt="loading..." /></center>
+          : 
+          <div>
+            <Player
               song={music[0].title}
               loc={'http://138.197.172.114' + music[0].loc}
             />
+            <MusicTable
+              music={music}
+            />
+          </div>
         }
       </div>
     );
   }
 }
+
+const MusicTable = ({ music }) => {
+  return (
+    <div>
+      {music
+      .map(song => song.artist)
+      .sort()
+      .filter((artist, index, array) => (index === 0) || (artist !== array[index - 1]))
+      .map(artist =>
+        <ArtistItem
+          artist={artist}
+          key={artist}
+        />
+      )}
+    </div>
+  )
+}
+
+const ArtistItem = ({ artist }) =>
+  <div style={{marginLeft: "50px"}}>
+    <span>{artist}</span>
+  </div>
 
 const Player = ({ song, loc }) => {
   return (
@@ -46,6 +73,5 @@ const Player = ({ song, loc }) => {
     </div>
   )
 };
-
 
 export default App;
