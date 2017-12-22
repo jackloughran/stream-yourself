@@ -11,6 +11,8 @@ class App extends Component {
       music: null,
       error: null,
     }
+
+    this.onArtistClick = this.onArtistClick.bind(this);
   }
 
   componentDidMount() {
@@ -18,6 +20,10 @@ class App extends Component {
       .then(response => response.json())
       .then(music => this.setState({ music }))
       .catch(error => this.setState({ error }));
+  }
+
+  onArtistClick(event, artist) {
+    console.log(artist);
   }
 
   render() {
@@ -36,6 +42,7 @@ class App extends Component {
             />
             <MusicTable
               music={music}
+              onClick={this.onArtistClick}
             />
           </div>
         }
@@ -44,7 +51,7 @@ class App extends Component {
   }
 }
 
-const MusicTable = ({ music }) => {
+const MusicTable = ({ music, onClick }) => {
   return (
     <div>
       {music
@@ -55,16 +62,17 @@ const MusicTable = ({ music }) => {
         <ArtistItem
           artist={artist}
           key={artist}
+          onClick={(artist) => onClick(artist)}
         />
       )}
     </div>
   )
 }
 
-const ArtistItem = ({ artist }) =>
-  <div style={{marginLeft: "50px"}}>
+const ArtistItem = ({ artist, onClick }) =>
+  <button style={{marginLeft: "50px"}} onClick={onClick}>
     <span>{artist}</span>
-  </div>
+  </button>
 
 const Player = ({ song, loc }) => {
   return (
