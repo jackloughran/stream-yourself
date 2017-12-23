@@ -1,28 +1,66 @@
-.App {
-  text-align: center;
+.app {
+  display: flex;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.list-button {
+  background: transparent;
+  color:#eee;
+  border-left-style: none;
+  border-right-style: none;
+  border-top-width: 1px;
+  border-top-color: #6666ee;
+  border-bottom-color: #6666ee;
+  width: 100%;
+  font-size: 175%;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.list-button__top {
+  border-top-style: solid;
+  border-bottom-style: solid;
 }
 
-.App-title {
-  font-size: 1.5em;
+.list-button_non-top {
+  border-top-style: none;
+  border-bottom-style: solid;
 }
 
-.App-intro {
-  font-size: large;
+.list-button:focus {
+  outline: none;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.list-button::-moz-focus-inner {
+  outline: none;
+}
+
+.music-list {
+  list-style-type: none;
+  margin-top: 50px;
+  padding-left: 0;
+  height: 100%;
+}
+
+.music-list__artists {
+  width: 40%;
+}
+
+.music-list__albums {
+  width: 30%;
+}
+
+.music-list__songs {
+  width: 30%;
+}
+
+
+
+
+
+/*------*\
+  Player
+\*------*/
+
+.player-container {
+  position: absolute;
+  margin: auto;
+  width: 100%;
 }
