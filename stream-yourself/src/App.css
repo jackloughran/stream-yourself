@@ -76,6 +76,11 @@ p {
   border-style: none;
 }
 
+.clear-text {
+  position: absolute;
+  right: 150px;
+}
+
 
 
 
@@ -97,7 +102,7 @@ p {
 
 .player__now-playing {
   position: absolute;
-  left: 370px;
+  left: 520px;
   top: 15px;  
   color: #eee;
   font-size: 20px;
@@ -105,7 +110,7 @@ p {
 
 .next-button {
   position: absolute;
-  left: 320px;
+  left: 475px;
   top: 15px;
   padding: 0;
 }

@@ -8,11 +8,13 @@ class App extends Component {
     super(props);
 
     this.state = {
+      persistedMusic: null,
       music: null,
       albums: null,
       songs: [],
       albumSongs: null,
       playAlbumLink: false,
+      nowPlaying: null,
       error: null,
     }
 
@@ -22,12 +24,13 @@ class App extends Component {
     this.onSongEnd = this.onSongEnd.bind(this);
     this.playAlbum = this.playAlbum.bind(this);
     this.onPlaylistClick = this.onPlaylistClick.bind(this);
+    this.onSearch = this.onSearch.bind(this);
   }
 
   componentDidMount() {
     fetch('http://138.197.172.114:48001/api/list')
       .then(response => response.json())
-      .then(music => this.setState({ music }))
+      .then(persistedMusic => this.setState({ persistedMusic, music: persistedMusic }))
       .catch(error => this.setState({ error }));
   }
 
@@ -43,7 +46,7 @@ class App extends Component {
 
     window.scrollTo(0, 0);
 
-    this.setState({ albums, playAlbumLink: false });
+    this.setState({ albums, playAlbumLink: false, albumSongs: null });
   }
 
   onAlbumClick(event, item) {
@@ -51,7 +54,8 @@ class App extends Component {
 
     const albumSongs = music
       .filter(song => song.artist === item.artist)
-      .filter(song => song.album === item.album);
+      .filter(song => song.album === item.album)
+      .sort((a, b) => a.id - b.id);
 
     window.scrollTo(0, 0);
     
@@ -64,7 +68,9 @@ class App extends Component {
     const song = music
       .filter(song => song.id === item.id);
 
-    songs.push(song[0]);
+    if (songs.filter(s => s.id === song[0].id) <= 0) {
+      songs.push(song[0]);
+    }
 
     this.setState({ songs });
   }
@@ -80,7 +86,9 @@ class App extends Component {
   playAlbum() {
     const { songs, albumSongs } = this.state;
 
-    songs.push(...albumSongs);
+    const nonDuplicateAlbumSongs = albumSongs.filter(song => songs.filter(s => s.id === song.id) <= 0);
+
+    songs.push(...nonDuplicateAlbumSongs);
 
     this.setState({ songs });
   }
@@ -90,6 +98,15 @@ class App extends Component {
 
     this.setState({
       songs: songs.filter(song => song.id !== item.id),
+    });
+  }
+
+  onSearch(event) {
+    const { persistedMusic } = this.state;
+    const searchTerm = event.target.value;
+    this.setState({
+      music: persistedMusic
+        .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase())),
     });
   }
 
@@ -104,14 +121,24 @@ class App extends Component {
       return (
         <div className="app">
           <div className="player-container">
-            <ConditionalPlayer
-              songs={songs}
+            <Search
+              onChange={this.onSearch}
+            />
+            {songs.length > 0 &&
+            <Player
+              loc={songs[0].loc}
+              song={songs[0].title}
               songEnd={this.onSongEnd}
-            />
-            <ConditionalPlayAlbumLink
-              condition={playAlbumLink}
-              onClick={this.playAlbum}
-            />
+            />}
+            {playAlbumLink &&
+              <button className="top-button  right-text  random-text  button" onClick={this.playAlbum}>Play full album</button>
+            }
+            {songs.length > 1 &&
+            <button
+              className="top-button  clear-text  random-text  button"
+              onClick={() => this.setState({ songs: songs.slice(0, 1) })}
+            >Clear
+            </button>}
           </div>
           <MusicTable
             list={music
@@ -137,8 +164,8 @@ class App extends Component {
             onClick={this.onSongClick}
           />
           <ConditionalMusicTable
-            condition={songs}
-            list={songs}
+            condition={songs.length > 1}
+            list={songs.slice(1)}
             objectKey="title"
             listClassName="music-list__playlist"
             onClick={this.onPlaylistClick}
@@ -181,50 +208,39 @@ const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
   )
 }
 
+const Search = ({ onChange }) =>
+  <input
+    style={{ margin: "15px" }}
+    type="text"
+    placeholder="filter"
+    onChange={onChange}
+  />
+
 const MusicItem = ({ className, item, onClick }) =>
   <button className={"list-button  button  " + className} onClick={onClick}>
     <span>{item}</span>
   </button>
 
-const ConditionalPlayer = ({ songs, songEnd }) => {
-  if (songs[0]) {
-    return (
-      <Player
-        loc={songs[0].loc}
-        song={songs[0].title}
-        songEnd={songEnd}
-      />
-    )
-  } else {
-    return (
-      <p className="random-text">Stream Yourself</p>
-    )
-  }
-};
-
 const Player = ({ loc, song, songEnd }) => {
+  const pauseEvent = e => {
+    if (e.keyCode === 32) {
+      const player = document.getElementById("player");
+      player.pause();
+      return false;
+    }
+  }
+  
+  document.onkeydown = pauseEvent;
   return (
     <span>
-      <audio className="player" src={loc}
+      <audio className="player" src={loc} id="player"
         onEnded={songEnd}
         autoPlay
         controls>Get a modern browser!</audio>
       <button className="top-button  random-text  next-button  button" onClick={songEnd}>next</button>
-      <span className="player__now-playing">Now Playing: {song}</span>
+      <span className="player__now-playing">{song}</span>
     </span>
   )
 };
-
-const ConditionalPlayAlbumLink = ({ condition, onClick }) => {
-  if (condition) {
-    return (
-      <button className="top-button  right-text  random-text  button" onClick={onClick}>Play full album</button>
-    )
-  } else {
-    return (
-      <p className="random-text  right-text">Stream Yourself</p>
-    )
-  }
-}
 
 export default App;
