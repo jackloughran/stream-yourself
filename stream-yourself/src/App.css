@@ -24,11 +24,11 @@
   border-bottom-style: solid;
 }
 
-.list-button:focus {
+.button:focus {
   outline: none;
 }
 
-.list-button::-moz-focus-inner {
+.button::-moz-focus-inner {
   outline: none;
 }
 
@@ -66,6 +66,12 @@ p {
   right: 0px;
 }
 
+.top-button {
+  background: transparent;
+  color:#eee;
+  border-style: none;
+}
+
 
 
 
@@ -87,8 +93,15 @@ p {
 
 .player__now-playing {
   position: absolute;
-  left: 320px;
+  left: 370px;
   top: 15px;  
   color: #eee;
   font-size: 20px;
+}
+
+.next-button {
+  position: absolute;
+  left: 320px;
+  top: 15px;
+  padding: 0;
 }

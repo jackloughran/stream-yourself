@@ -162,7 +162,7 @@ const MusicTable = ({ list, listClassName, onClick }) => {
 }
 
 const MusicItem = ({ className, item, onClick }) =>
-  <button className={"list-button  " + className} onClick={onClick}>
+  <button className={"list-button  button  " + className} onClick={onClick}>
     <span>{item}</span>
   </button>
 
@@ -189,7 +189,7 @@ const Player = ({ loc, song, songEnd }) => {
         onEnded={songEnd}
         autoPlay
         controls>Get a modern browser!</audio>
-      <button className="random-text" onClick={songEnd}>next</button>
+      <button className="top-button  random-text  next-button  button" onClick={songEnd}>next</button>
       <span className="player__now-playing">Now Playing: {song}</span>
     </span>
   )
@@ -198,7 +198,7 @@ const Player = ({ loc, song, songEnd }) => {
 const ConditionalPlayAlbumLink = ({ condition, onClick }) => {
   if (condition) {
     return (
-      <button className="random-text  right-text" onClick={onClick}>Play full album</button>
+      <button className="top-button  right-text  random-text  button" onClick={onClick}>Play full album</button>
     )
   } else {
     return (
