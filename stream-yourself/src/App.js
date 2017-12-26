@@ -62,7 +62,7 @@ class App extends Component {
     const { music, songs } = this.state;
 
     const song = music
-      .filter(song => song.title === item.title);
+      .filter(song => song.id === item.id);
 
     songs.push(song[0]);
 
@@ -85,8 +85,12 @@ class App extends Component {
     this.setState({ songs });
   }
 
-  onPlaylistClick(event, clickedSong) {
-    console.log(clickedSong);
+  onPlaylistClick(event, item) {
+    const { songs } = this.state;
+
+    this.setState({
+      songs: songs.filter(song => song.id !== item.id),
+    });
   }
 
   render() {
@@ -161,7 +165,6 @@ const ConditionalMusicTable = ({ condition, list, listClassName, onClick , objec
 }
 
 const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
-  console.log(list)
   return (
     <ul className={"music-list  " + listClassName }>
       {list
