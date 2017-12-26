@@ -10,19 +10,20 @@ class App extends Component {
     this.state = {
       music: null,
       albums: null,
-      songs: null,
-      song: null,
+      songs: [],
+      albumSongs: null,
+      playAlbumLink: false,
       error: null,
     }
 
     this.onArtistClick = this.onArtistClick.bind(this);
     this.onAlbumClick = this.onAlbumClick.bind(this);
     this.onSongClick = this.onSongClick.bind(this);
+    this.onSongEnd = this.onSongEnd.bind(this);
   }
 
   componentDidMount() {
-    // fetch('http://138.197.172.114:48001/api/list')
-    fetch('http://localhost:48001/api/list')
+    fetch('http://138.197.172.114:48001/api/list')
       .then(response => response.json())
       .then(music => this.setState({ music }))
       .catch(error => this.setState({ error }));
@@ -35,31 +36,45 @@ class App extends Component {
       .filter(song => song.artist === artist)
       .map(song => song.album)
       .filter((album, index, array) => (index === 0) || (album !== array[index - 1]));
-    
-    this.setState({ albums, songs: null });
+
+    window.scrollTo(0, 0);
+
+    this.setState({ albums, playAlbumLink: false });
   }
 
   onAlbumClick(event, album) {
     const { music } = this.state;
 
-    const songs = music
+    const albumSongs = music
       .filter(song => song.album === album)
       .map(song => song.title);
+
+    window.scrollTo(0, 0);
+    
+    this.setState({ albumSongs, playAlbumLink: true });
+  }
+
+  onSongClick(event, clickedSong) {
+    const { music, songs } = this.state;
+
+    const song = music
+      .filter(song => song.title === clickedSong);
+
+    songs.push(song[0]);
 
     this.setState({ songs });
   }
 
-  onSongClick(event, songs) {
-    const { music } = this.state;
+  onSongEnd() {
+    const { songs } = this.state;
 
-    const song = music
-      .filter(song => song.title === songs);
+    songs.shift();
 
-    console.log(song)
+    this.setState({ songs });
   }
 
   render() {
-    const { music, albums, songs, song } = this.state;
+    const { music, albums, albumSongs, playAlbumLink, songs } = this.state;
 
     if (!music) {
       return (
@@ -70,7 +85,11 @@ class App extends Component {
         <div className="app">
           <div className="player-container">
             <ConditionalPlayer
-              song={song}
+              songs={songs}
+              songEnd={this.onSongEnd}
+            />
+            <ConditionalPlayAlbumLink
+              condition={playAlbumLink}
             />
           </div>
           <MusicTable
@@ -89,8 +108,8 @@ class App extends Component {
             onClick={this.onAlbumClick}
           />
           <ConditionalMusicTable
-            condition={songs}
-            list={songs}
+            condition={albumSongs}
+            list={albumSongs}
             listClassName="music-list__songs"
             onClick={this.onSongClick}
           />
@@ -136,24 +155,44 @@ const MusicItem = ({ className, artist, onClick }) =>
     <span>{artist}</span>
   </button>
 
-const ConditionalPlayer = ({ song }) => {
-  if (song) {
+const ConditionalPlayer = ({ songs, songEnd }) => {
+  if (songs[0]) {
     return (
       <Player
-        loc={song.loc}
+        loc={songs[0].loc}
+        song={songs[0].title}
+        songEnd={songEnd}
       />
     )
   } else {
     return (
-      <p style={{color: "#eee"}}>Stream Yourself</p>
+      <p className="random-text">Stream Yourself</p>
+    )
+  }
+};
+
+const Player = ({ loc, song, songEnd }) => {
+  return (
+    <span>
+      <audio className="player" src={loc}
+        onEnded={songEnd}
+        autoPlay
+        controls>Get a modern browser!</audio>
+      <span className="player__now-playing">Now Playing: {song}</span>
+    </span>
+  )
+};
+
+const ConditionalPlayAlbumLink = ({ condition }) => {
+  if (condition) {
+    return (
+      <p className="random-text  right-text">Play full album</p>
+    )
+  } else {
+    return (
+      <p className="random-text  right-text">Stream Yourself</p>
     )
   }
 }
-
-const Player = ({ loc }) => {
-  return (
-    <audio src={loc} controls></audio>
-  )
-};
 
 export default App;
