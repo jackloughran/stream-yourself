@@ -11,7 +11,7 @@
   border-top-color: #6666ee;
   border-bottom-color: #6666ee;
   width: 100%;
-  font-size: 175%;
+  font-size: 150%;
 }
 
 .list-button__top {
@@ -40,15 +40,19 @@
 }
 
 .music-list__artists {
-  width: 40%;
+  width: 25%;
 }
 
 .music-list__albums {
-  width: 30%;
+  width: 25%;
 }
 
 .music-list__songs {
-  width: 30%;
+  width: 25%;
+}
+
+.music-list__playlist {
+  width: 25%;
 }
 
 p {

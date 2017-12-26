@@ -21,6 +21,7 @@ class App extends Component {
     this.onSongClick = this.onSongClick.bind(this);
     this.onSongEnd = this.onSongEnd.bind(this);
     this.playAlbum = this.playAlbum.bind(this);
+    this.onPlaylistClick = this.onPlaylistClick.bind(this);
   }
 
   componentDidMount() {
@@ -30,35 +31,38 @@ class App extends Component {
       .catch(error => this.setState({ error }));
   }
 
-  onArtistClick(event, artist) {
+  onArtistClick(event, item) {
     const { music } = this.state;
+
+    const artist = item.artist;
 
     const albums = music
       .filter(song => song.artist === artist)
-      .map(song => song.album)
-      .filter((album, index, array) => (index === 0) || (album !== array[index - 1]));
+      .sort((a, b) => a.album < b.album ? -1 : 1)
+      .filter((song, index, array) => (index === 0) || (song.album !== array[index - 1].album));
 
     window.scrollTo(0, 0);
 
     this.setState({ albums, playAlbumLink: false });
   }
 
-  onAlbumClick(event, album) {
+  onAlbumClick(event, item) {
     const { music } = this.state;
 
     const albumSongs = music
-      .filter(song => song.album === album);
+      .filter(song => song.artist === item.artist)
+      .filter(song => song.album === item.album);
 
     window.scrollTo(0, 0);
     
     this.setState({ albumSongs, playAlbumLink: true });
   }
 
-  onSongClick(event, clickedSong) {
+  onSongClick(event, item) {
     const { music, songs } = this.state;
 
     const song = music
-      .filter(song => song.title === clickedSong);
+      .filter(song => song.title === item.title);
 
     songs.push(song[0]);
 
@@ -78,9 +82,11 @@ class App extends Component {
 
     songs.push(...albumSongs);
 
-    console.log(songs)
-
     this.setState({ songs });
+  }
+
+  onPlaylistClick(event, clickedSong) {
+    console.log(clickedSong);
   }
 
   render() {
@@ -105,24 +111,33 @@ class App extends Component {
           </div>
           <MusicTable
             list={music
-              .map(song => song.artist)
-              .sort()
-              .filter((artist, index, array) => (index === 0) || (artist !== array[index - 1]))
+              .sort((a, b) => a.artist < b.artist ? -1 : 1)
+              .filter((song, index, array) => (index === 0) || (song.artist !== array[index - 1].artist))
             }
+            objectKey="artist"
             listClassName="music-list__artists"
             onClick={this.onArtistClick}
           />
           <ConditionalMusicTable
             condition={albums}
             list={albums}
+            objectKey="album"
             listClassName="music-list__albums"
             onClick={this.onAlbumClick}
           />
           <ConditionalMusicTable
             condition={albumSongs}
-            list={albumSongs && albumSongs.map(song => song.title)}
+            list={albumSongs}
+            objectKey="title"
             listClassName="music-list__songs"
             onClick={this.onSongClick}
+          />
+          <ConditionalMusicTable
+            condition={songs}
+            list={songs}
+            objectKey="title"
+            listClassName="music-list__playlist"
+            onClick={this.onPlaylistClick}
           />
         </div>
       )
@@ -130,12 +145,13 @@ class App extends Component {
   }
 }
 
-const ConditionalMusicTable = ({ condition, list, listClassName, onClick }) => {
+const ConditionalMusicTable = ({ condition, list, listClassName, onClick , objectKey }) => {
   if (condition) {
     return (
       <MusicTable
         list={list}
         listClassName={listClassName}
+        objectKey={objectKey}
         onClick={onClick}
       />
     )
@@ -144,15 +160,16 @@ const ConditionalMusicTable = ({ condition, list, listClassName, onClick }) => {
   }
 }
 
-const MusicTable = ({ list, listClassName, onClick }) => {
+const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
+  console.log(list)
   return (
     <ul className={"music-list  " + listClassName }>
       {list
       .map((item, index) =>
-        <li key={item}>
+        <li key={item.id}>
           <MusicItem
             className={index === 0 ? "list-button__top" : "list-button_non-top"}
-            item={item}
+            item={item[objectKey]}
             onClick={e => onClick(e, item)}
           />
         </li>
