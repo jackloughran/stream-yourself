@@ -20,6 +20,7 @@ class App extends Component {
     this.onAlbumClick = this.onAlbumClick.bind(this);
     this.onSongClick = this.onSongClick.bind(this);
     this.onSongEnd = this.onSongEnd.bind(this);
+    this.playAlbum = this.playAlbum.bind(this);
   }
 
   componentDidMount() {
@@ -46,8 +47,7 @@ class App extends Component {
     const { music } = this.state;
 
     const albumSongs = music
-      .filter(song => song.album === album)
-      .map(song => song.title);
+      .filter(song => song.album === album);
 
     window.scrollTo(0, 0);
     
@@ -73,6 +73,16 @@ class App extends Component {
     this.setState({ songs });
   }
 
+  playAlbum() {
+    const { songs, albumSongs } = this.state;
+
+    songs.push(...albumSongs);
+
+    console.log(songs)
+
+    this.setState({ songs });
+  }
+
   render() {
     const { music, albums, albumSongs, playAlbumLink, songs } = this.state;
 
@@ -90,6 +100,7 @@ class App extends Component {
             />
             <ConditionalPlayAlbumLink
               condition={playAlbumLink}
+              onClick={this.playAlbum}
             />
           </div>
           <MusicTable
@@ -109,7 +120,7 @@ class App extends Component {
           />
           <ConditionalMusicTable
             condition={albumSongs}
-            list={albumSongs}
+            list={albumSongs && albumSongs.map(song => song.title)}
             listClassName="music-list__songs"
             onClick={this.onSongClick}
           />
@@ -141,7 +152,7 @@ const MusicTable = ({ list, listClassName, onClick }) => {
         <li key={item}>
           <MusicItem
             className={index === 0 ? "list-button__top" : "list-button_non-top"}
-            artist={item}
+            item={item}
             onClick={e => onClick(e, item)}
           />
         </li>
@@ -150,9 +161,9 @@ const MusicTable = ({ list, listClassName, onClick }) => {
   )
 }
 
-const MusicItem = ({ className, artist, onClick }) =>
+const MusicItem = ({ className, item, onClick }) =>
   <button className={"list-button  " + className} onClick={onClick}>
-    <span>{artist}</span>
+    <span>{item}</span>
   </button>
 
 const ConditionalPlayer = ({ songs, songEnd }) => {
@@ -178,15 +189,16 @@ const Player = ({ loc, song, songEnd }) => {
         onEnded={songEnd}
         autoPlay
         controls>Get a modern browser!</audio>
+      <button className="random-text" onClick={songEnd}>next</button>
       <span className="player__now-playing">Now Playing: {song}</span>
     </span>
   )
 };
 
-const ConditionalPlayAlbumLink = ({ condition }) => {
+const ConditionalPlayAlbumLink = ({ condition, onClick }) => {
   if (condition) {
     return (
-      <p className="random-text  right-text">Play full album</p>
+      <button className="random-text  right-text" onClick={onClick}>Play full album</button>
     )
   } else {
     return (
