@@ -1,5 +1,10 @@
-# TODO
-* ~~Frontend checklist~~
-* Set up development environment
-* collapse tree on second click
-* dynamically update title with song
+# Stream Yourself
+
+*web app to play music stored locally on my server*
+
+### TODO
+
+- [ ] "hoops" bug
+- [ ] fix songs with no album
+- [ ] fix cover art (backend)
+- [ ] add last.fm
