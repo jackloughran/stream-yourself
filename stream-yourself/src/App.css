@@ -55,6 +55,31 @@
   width: 25%;
 }
 
+@media all and (max-width: 480px) {
+  .music-list {
+    list-style-type: none;
+    margin-top: 50px;
+    padding-left: 0;
+    height: auto;
+  }
+  
+  .music-list__artists {
+    width: 100%;
+  }
+  
+  .music-list__albums {
+    width: 100%;
+  }
+  
+  .music-list__songs {
+    width: 100%;
+  }
+  
+  .music-list__playlist {
+    width: 100%;
+  }
+}
+
 p {
   color: #eee;
 }
@@ -118,6 +143,20 @@ button {
   top: 15px;  
   color: #eee;
   font-size: 20px;
+}
+
+@media all and (max-width: 480px) {
+  .player__now-playing {
+    display: none;
+  }
+
+  .filter {
+    display: none;
+  }
+
+  .player {
+    width: 10px;
+  }
 }
 
 .next-button {

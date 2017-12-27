@@ -218,6 +218,7 @@ const Search = ({ onChange }) =>
     style={{ margin: "15px" }}
     type="text"
     placeholder="filter"
+    className="filter"
     onChange={onChange}
   />
 
