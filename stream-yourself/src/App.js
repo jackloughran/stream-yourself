@@ -229,7 +229,7 @@ const Player = ({ loc, song, songEnd }) => {
       return false;
     }
   }
-  
+
   document.onkeydown = pauseEvent;
   return (
     <span>
@@ -237,7 +237,7 @@ const Player = ({ loc, song, songEnd }) => {
         onEnded={songEnd}
         autoPlay
         controls>Get a modern browser!</audio>
-      <button className="top-button  random-text  next-button  button" onClick={songEnd}>next</button>
+      <button className="top-button  random-text  next-button  button" onClick={songEnd}>Next</button>
       <span className="player__now-playing">{song}</span>
     </span>
   )

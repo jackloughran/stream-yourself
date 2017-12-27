@@ -79,6 +79,18 @@ p {
 .clear-text {
   position: absolute;
   right: 150px;
+  top: 15px;
+  padding: 0;
+  color: rgba(238, 238, 238, 0.6);
+}
+
+button:hover {
+  color: rgb(214, 211, 211);
+  transition: .2s ease;
+}
+
+button {
+  transition: .2s ease;
 }
 
 
@@ -111,6 +123,7 @@ p {
 .next-button {
   position: absolute;
   left: 475px;
-  top: 15px;
+  top: 14px;
   padding: 0;
+  color: rgba(238, 238, 238, 0.6);
 }
