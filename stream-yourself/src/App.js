@@ -113,7 +113,7 @@ class App extends Component {
   }
 
   render() {
-    const { music, albums, albumSongs, playAlbumLink, songs } = this.state;
+    const { music, albums, albumSongs, songs } = this.state;
 
     if (!music) {
       return (
@@ -122,85 +122,100 @@ class App extends Component {
     } else { 
       return (
         <div className="app">
-          <div className="player-container">
             <Search
               onChange={this.onSearch}
             />
+            <div className="header"><h1>Stream Yourself</h1></div>
+          <div className="player-container">
             {songs.length > 0 &&
             <Player
-              loc={songs[0].loc}
-              song={songs[0].title}
+              song={songs[0]}
               songEnd={this.onSongEnd}
             />}
-            {playAlbumLink &&
-              <button className="top-button  right-text  random-text  button" onClick={this.playAlbum}>Play full album</button>
-            }
             {songs.length > 1 &&
             <button
               className="top-button  clear-text  random-text  button"
               onClick={() => this.setState({ songs: songs.slice(0, 1) })}
             >Clear
             </button>}
+          </div>
+          <div className="side-bar side-bar__left">
+            <div className="side-bar__artists">
+              <MusicTable
+                list={music
+                  .sort((a, b) => a.artist < b.artist ? -1 : 1)
+                  .filter((song, index, array) => (index === 0) || (song.artist !== array[index - 1].artist))
+                }
+                objectKey="artist"
+                onClick={this.onArtistClick}
+              />
+            </div>
+          </div>
+          {albums && !albumSongs &&
+            <AlbumList
+              list={albums}
+              onClick={this.onAlbumClick}
+            />
+          }
+          {albumSongs &&
+            <SongList
+              list={albumSongs}
+              onSongClick={this.onSongClick}
+              onAlbumClick={this.playAlbum}
+            />
+          }
+          <div className="side-bar side-bar__right">
             {songs.length > 0 &&
-              <AlbumArt
-                loc={songs[0].artLoc}
+              <Playlist
+                list={songs}
+                onClick={this.onPlaylistClick}
               />
             }
           </div>
-          <MusicTable
-            list={music
-              .sort((a, b) => a.artist < b.artist ? -1 : 1)
-              .filter((song, index, array) => (index === 0) || (song.artist !== array[index - 1].artist))
-            }
-            objectKey="artist"
-            listClassName="music-list__artists"
-            onClick={this.onArtistClick}
-          />
-          <ConditionalMusicTable
-            condition={albums}
-            list={albums}
-            objectKey="album"
-            listClassName="music-list__albums"
-            onClick={this.onAlbumClick}
-          />
-          <ConditionalMusicTable
-            condition={albumSongs}
-            list={albumSongs}
-            objectKey="title"
-            listClassName="music-list__songs"
-            onClick={this.onSongClick}
-          />
-          <ConditionalMusicTable
-            condition={songs.length > 1}
-            list={songs.slice(1)}
-            objectKey="title"
-            listClassName="music-list__playlist"
-            onClick={this.onPlaylistClick}
-          />
         </div>
       )
     }
   }
 }
 
-const ConditionalMusicTable = ({ condition, list, listClassName, onClick , objectKey }) => {
-  if (condition) {
-    return (
-      <MusicTable
-        list={list}
-        listClassName={listClassName}
-        objectKey={objectKey}
-        onClick={onClick}
-      />
-    )
-  } else {
-    return(<span></span>)
-  }
+const AlbumList = ({ list, onClick }) => {
+  return (
+    <div className="content-spacing">
+      {list
+        .map((item, index) =>
+          <div className="album-icon" onClick={e => onClick(e, item)} key={item.id}>
+            <AlbumArt loc={item.artLoc} />
+            <div className="album-name-container">
+              <a className="album-name">{item.album}</a>
+            </div>
+          </div>
+        )}
+    </div>
+  )
+}
+
+const SongList = ({ list, onSongClick, onAlbumClick }) => {
+  return (
+    <div className="content-spacing">
+        <div className="songs-album-icon" onClick={onAlbumClick}>
+          <AlbumArt loc={list[0].artLoc} />
+        </div>
+      <section className="songs-list">
+        {list
+          .map((item, index) =>
+          <div className="songs-item" key={item.id}>
+            <a className="song" onClick={e => onSongClick(e, item)}>{index + 1}. {item.title}</a>
+          </div>
+        )
+        }
+      </section>
+    </div>
+  )
 }
 
 const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
   return (
-    <ul className={"music-list  " + listClassName }>
+    <ul className="music-list">
       {list
       .map((item, index) =>
         <li key={item.id}>
@@ -215,9 +230,22 @@ const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
   )
 }
 
+const Playlist = ({ list, onClick }) => {
+  return (
+    <ul className="music-list">
+      {list
+        .map((item, index) =>
+          <li key={item.id}>
+            <a className="song" onClick={e => onClick(e, item)}>{index}. {item.title}</a>
+          </li>
+      )
+      }
+    </ul>
+  )
+}
+
 const Search = ({ onChange }) =>
   <input
-    style={{ margin: "15px" }}
     type="search"
     placeholder="filter"
     className="filter"
@@ -231,7 +259,7 @@ const MusicItem = ({ className, item, onClick }) =>
     <span>{item}</span>
   </button>
 
-const Player = ({ loc, song, songEnd }) => {
+const Player = ({ song, songEnd }) => {
   const pauseEvent = e => {
     if (e.keyCode === 32) {
       const player = document.getElementById("player");
@@ -242,13 +270,13 @@ const Player = ({ loc, song, songEnd }) => {
 
   document.onkeydown = pauseEvent;
   return (
-    <span>
-      <audio className="player" src={loc} id="player"
+    <span style={{display: "flex"}}>
+      <audio className="player" src={song.loc} id="player"
         onEnded={songEnd}
         autoPlay
         controls>Get a modern browser!</audio>
-      <button className="top-button  random-text  next-button  button" onClick={songEnd}>{'>'}`</button>
-      <span className="player__now-playing">{song}</span>
+      <button className="top-button  random-text  next-button  button" onClick={songEnd}>{'>'}</button>
+      <span className="player__now-playing">{song.title} - {song.artist} [{song.album}]</span>
     </span>
   )
 };
@@ -256,15 +284,7 @@ const Player = ({ loc, song, songEnd }) => {
 const AlbumArt = ({ loc }) =>
   <img
     src={loc}
-    style={{
-      position: "absolute",
-      top: "50px",
-      height: "200px",
-      marginRight: "auto",
-      marginLeft: "auto",
-      left: "0",
-      right: "0",
-    }}
+    className="album-art"
     alt="album art"
   />
 
