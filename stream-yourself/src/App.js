@@ -245,7 +245,7 @@ const Player = ({ loc, song, songEnd }) => {
         onEnded={songEnd}
         autoPlay
         controls>Get a modern browser!</audio>
-      <button className="top-button  random-text  next-button  button" onClick={songEnd}>Next</button>
+      <button className="top-button  random-text  next-button  button" onClick={songEnd}>{'>'}`</button>
       <span className="player__now-playing">{song}</span>
     </span>
   )
