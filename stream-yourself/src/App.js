@@ -106,7 +106,9 @@ class App extends Component {
     const searchTerm = event.target.value;
     this.setState({
       music: persistedMusic
-        .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase())),
+        .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase())
+                     || item.album.toLowerCase().includes(searchTerm.toLowerCase())
+                     || item.title.toLowerCase().includes(searchTerm.toLowerCase())),
     });
   }
 
@@ -121,6 +123,9 @@ class App extends Component {
       return (
         <div className="app">
           <div className="player-container">
+            {songs.length > 1 &&
+              <audio src={songs[1].loc}></audio>
+            }
             <Search
               onChange={this.onSearch}
             />
