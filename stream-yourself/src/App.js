@@ -123,9 +123,6 @@ class App extends Component {
       return (
         <div className="app">
           <div className="player-container">
-            {songs.length > 1 &&
-              <audio src={songs[1].loc}></audio>
-            }
             <Search
               onChange={this.onSearch}
             />
@@ -144,6 +141,11 @@ class App extends Component {
               onClick={() => this.setState({ songs: songs.slice(0, 1) })}
             >Clear
             </button>}
+            {songs.length > 0 &&
+              <AlbumArt
+                loc={songs[0].artLoc}
+              />
+            }
           </div>
           <MusicTable
             list={music
@@ -250,5 +252,20 @@ const Player = ({ loc, song, songEnd }) => {
     </span>
   )
 };
+
+const AlbumArt = ({ loc }) =>
+  <img
+    src={loc}
+    style={{
+      position: "absolute",
+      top: "50px",
+      height: "200px",
+      marginRight: "auto",
+      marginLeft: "auto",
+      left: "0",
+      right: "0",
+    }}
+    alt="album art"
+  />
 
 export default App;
