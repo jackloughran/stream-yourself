@@ -216,9 +216,11 @@ const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
 const Search = ({ onChange }) =>
   <input
     style={{ margin: "15px" }}
-    type="text"
+    type="search"
     placeholder="filter"
     className="filter"
+    onClick={() => document.getElementById('filter').select()}
+    id="filter"
     onChange={onChange}
   />
 
