@@ -10,11 +10,14 @@ class App extends Component {
     this.state = {
       persistedMusic: null,
       music: null,
+      artists: null,
       albums: null,
       songs: [],
       albumSongs: null,
       playAlbumLink: false,
       nowPlaying: null,
+      selectedItem: null,
+      selectedItemIndex: 0,
       error: null,
     }
 
@@ -32,6 +35,62 @@ class App extends Component {
       .then(response => response.json())
       .then(persistedMusic => this.setState({ persistedMusic, music: persistedMusic }))
       .catch(error => this.setState({ error }));
+    
+    document.onkeydown = e => {
+      const filter = document.getElementById('filter');
+      const player = document.getElementById("player");
+      if (e.keyCode === 32) {
+        if (filter !== document.activeElement) {
+          if (player.paused) {
+            player.play();
+          } else {
+            player.pause();
+          }
+          return false;
+        }
+      } else if (e.keyCode === 78) {
+        if (filter !== document.activeElement) {
+          this.onSongEnd();
+        }
+      } else if (e.keyCode === 68) {
+        if (filter !== document.activeElement) {
+          this.setState({ songs: [] });
+          player.src = '';
+        }
+      } else if (e.keyCode === 70) {
+        if (filter !== document.activeElement) {
+          filter.focus();
+          filter.value = '';
+          this.setState({ music: this.state.persistedMusic });
+          return false;
+        }
+      } else if (e.keyCode === 13) {
+        if (filter === document.activeElement) {
+          const item = this.state.selectedItem
+          if (item) {
+            if (!this.state.albums) {
+              this.onArtistClick(null, item);
+            } else if (!this.state.albumSongs) {
+              this.onAlbumClick(null, item);
+            } else {
+              this.playAlbum();
+            }
+          }
+        }
+      } else if (e.keyCode === 40) {
+        if (filter === document.activeElement) {
+          const { selectedItemIndex, music } = this.state;
+          const newIndex = selectedItemIndex + 1;
+          const selectedItem = music[selectedItemIndex];
+          console.log(selectedItem)
+          this.setState({ selectedItem, selectedItemIndex: newIndex });
+        }
+      } else if (e.keyCode === 27) {
+        if (filter === document.activeElement) {
+          filter.blur();
+        }
+      }
+    }
   }
 
   onArtistClick(event, item) {
@@ -118,12 +177,11 @@ class App extends Component {
   onSearch(event) {
     const { persistedMusic } = this.state;
     const searchTerm = event.target.value;
-    this.setState({
-      music: persistedMusic
-        .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase())
-                     || item.album.toLowerCase().includes(searchTerm.toLowerCase())
-                     || item.title.toLowerCase().includes(searchTerm.toLowerCase())),
-    });
+    const music = persistedMusic
+    .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase())
+                 || item.album.toLowerCase().includes(searchTerm.toLowerCase()));
+    const selectedItem = music[0];
+    this.setState({ music, selectedItem, selectedItemIndex: 0 });
   }
 
   render() {
@@ -223,10 +281,16 @@ class SongList extends Component {
     const { list, onSongClick, onAlbumClick } = this.props;
     return (
       <div className="song-list">
-          <div className="songs-album-icon" onClick={onAlbumClick}>
-            <AlbumArt loc={list[0].artLoc} />
+          <div className="songs-album">
+            <div className="album-art-hover" onClick={onAlbumClick}><AlbumArt loc={list[0].artLoc} /></div>
+            <div className="songs-album__album-info">
+              <div className="songs-album__album-info__album-name"><h3>{list[0].album}</h3></div>
+              <div className="songs-album__album-info__album-artist">
+                <span style={{color: "rgba(238, 238, 238, 0.6)"}}>By </span>{list[0].artist}
+              </div>
+            </div>
           </div>
-        <section className="songs-list">
+        <div className="songs-list">
           {list
             .map((item, index) =>
             <div className="songs-item" key={item.id}>
@@ -234,7 +298,7 @@ class SongList extends Component {
             </div>
           )
           }
-        </section>
+        </div>
       </div>
     )
   }
@@ -287,19 +351,7 @@ const MusicItem = ({ className, item, onClick }) =>
   </button>
 
 const SongInfo = ({ song, songEnd }) => {
-  const pauseEvent = e => {
-    if (e.keyCode === 32) {
-      const player = document.getElementById("player");
-      if (player.paused) {
-        player.play();
-      } else {
-        player.pause();
-      }
-      return false;
-    }
-  }
-
-  document.onkeydown = pauseEvent;
+  document.title = song.title + " by " + song.artist;
   return (
     <span>
       <button className="top-button  next-button  button" onClick={songEnd}>{'>'}</button>
