@@ -64,12 +64,17 @@ class App extends Component {
 
   onSongClick(event, item) {
     const { music, songs } = this.state;
+    const changeSong = songs.length === 0;
 
     const song = music
       .filter(song => song.id === item.id);
 
     if (songs.filter(s => s.id === song[0].id) <= 0) {
       songs.push(song[0]);
+    }
+
+    if (changeSong) {
+      addSong(songs[0]);
     }
 
     this.setState({ songs });
@@ -80,15 +85,24 @@ class App extends Component {
 
     songs.shift();
 
+    if (songs.length > 0) {
+      addSong(songs[0]);
+    }
+
     this.setState({ songs });
   }
 
   playAlbum() {
     const { songs, albumSongs } = this.state;
+    const changeSong = songs.length === 0;
 
     const nonDuplicateAlbumSongs = albumSongs.filter(song => songs.filter(s => s.id === song.id) <= 0);
 
     songs.push(...nonDuplicateAlbumSongs);
+
+    if (changeSong) {
+      addSong(songs[0]);
+    }
 
     this.setState({ songs });
   }
@@ -122,15 +136,18 @@ class App extends Component {
     } else { 
       return (
         <div className="app">
+          <div className="filter-container">
             <Search
               onChange={this.onSearch}
             />
-            <div className="header"><h1>Stream Yourself</h1></div>
+          </div>
+          <div className="header"><h1>Stream Yourself</h1></div>
           <div className="player-container">
+          <Player
+            songEnd={this.onSongEnd}/>
             {songs.length > 0 &&
-            <Player
+            <SongInfo
               song={songs[0]}
-              songEnd={this.onSongEnd}
             />}
             {songs.length > 1 &&
             <button
@@ -151,19 +168,21 @@ class App extends Component {
               />
             </div>
           </div>
-          {albums && !albumSongs &&
-            <AlbumList
-              list={albums}
-              onClick={this.onAlbumClick}
-            />
-          }
-          {albumSongs &&
-            <SongList
-              list={albumSongs}
-              onSongClick={this.onSongClick}
-              onAlbumClick={this.playAlbum}
-            />
-          }
+          <div className="content-spacing">
+            {albums && !albumSongs &&
+              <AlbumList
+                list={albums}
+                onClick={this.onAlbumClick}
+              />
+            }
+            {albumSongs &&
+              <SongList
+                list={albumSongs}
+                onSongClick={this.onSongClick}
+                onAlbumClick={this.playAlbum}
+              />
+            }
+          </div>
           <div className="side-bar side-bar__right">
             {songs.length > 0 &&
               <Playlist
@@ -172,6 +191,9 @@ class App extends Component {
               />
             }
           </div>
+          {songs.length > 1 &&
+            <audio src={songs[1].loc}></audio>
+          }
         </div>
       )
     }
@@ -180,7 +202,7 @@ class App extends Component {
 
 const AlbumList = ({ list, onClick }) => {
   return (
-    <div className="content-spacing">
+    <div className="album-list">
       {list
         .map((item, index) =>
           <div className="album-icon" onClick={e => onClick(e, item)} key={item.id}>
@@ -190,13 +212,13 @@ const AlbumList = ({ list, onClick }) => {
             </div>
           </div>
         )}
-    </div>
+     </div>
   )
 }
 
 const SongList = ({ list, onSongClick, onAlbumClick }) => {
   return (
-    <div className="content-spacing">
+    <div className="song-list">
         <div className="songs-album-icon" onClick={onAlbumClick}>
           <AlbumArt loc={list[0].artLoc} />
         </div>
@@ -259,11 +281,15 @@ const MusicItem = ({ className, item, onClick }) =>
     <span>{item}</span>
   </button>
 
-const Player = ({ song, songEnd }) => {
+const SongInfo = ({ song, songEnd }) => {
   const pauseEvent = e => {
     if (e.keyCode === 32) {
       const player = document.getElementById("player");
-      player.pause();
+      if (player.paused) {
+        player.play();
+      } else {
+        player.pause();
+      }
       return false;
     }
   }
@@ -271,15 +297,17 @@ const Player = ({ song, songEnd }) => {
   document.onkeydown = pauseEvent;
   return (
     <span style={{display: "flex"}}>
-      <audio className="player" src={song.loc} id="player"
-        onEnded={songEnd}
-        autoPlay
-        controls>Get a modern browser!</audio>
       <button className="top-button  random-text  next-button  button" onClick={songEnd}>{'>'}</button>
       <span className="player__now-playing">{song.title} - {song.artist} [{song.album}]</span>
     </span>
   )
 };
+
+const Player = ({ songEnd }) =>
+  <audio className="player" id="player"
+    onEnded={songEnd}
+    autoPlay
+    controls>Get a modern browser!</audio>
 
 const AlbumArt = ({ loc }) =>
   <img
@@ -287,5 +315,12 @@ const AlbumArt = ({ loc }) =>
     className="album-art"
     alt="album art"
   />
+
+function addSong(song) {
+  const player = document.getElementById('player');
+
+  player.src = song.loc;
+  player.play();
+};
 
 export default App;
