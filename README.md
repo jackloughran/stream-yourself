@@ -6,6 +6,6 @@
 
 - [ ] "hoops" bug
 - [ ] fix songs with no album
-- [ ] fix cover art (backend)
+- [x] fix cover art (backend)
 - [ ] add last.fm
 - [x] add clear button for filter
