@@ -44,12 +44,6 @@ p {
   color: #eee;
 }
 
-.random-text {
-  margin: 0;
-  padding: 15px;
-  font-size: 20px;
-}
-
 .right-text {
   position: absolute;
   right: 0px;
@@ -63,10 +57,11 @@ p {
 
 .clear-text {
   position: absolute;
-  right: 150px;
-  top: 15px;
+  right: 57.075px;
+  bottom: 36px;
   padding: 0;
   color: rgba(238, 238, 238, 0.6);
+  font-size: 18px;
 }
 
 button:hover {
@@ -94,7 +89,6 @@ button {
 .side-bar {
   position: relative;
   float: left;
-  width: 220px;
   height: calc(100% - 50px);
   margin-bottom: 90px;
   background: rgba(0, 0, 0, 0.2);
@@ -106,16 +100,31 @@ button {
 }
 
 .side-bar__right {
+  padding-top: 50px;
+  padding-left: 24px;
+  padding-right: 24px;
+  width: 172px;
   float: right;
 }
 
 .side-bar__artists {
+  width: 172px;
   padding-left: 24px;
   padding-right: 24px;
   overflow: scroll;
   max-height: 100%;
 }
 
+.queue-header {
+  position: fixed;
+  right: 72.656px;
+  top: 11px;
+  color: #eee;
+}
+
+.queue-header h2 {
+  margin: 0;
+}
 
 
 
@@ -136,14 +145,48 @@ button {
 }
 
 .player {
-  padding: 29px;
-  padding-right: 0px;
+  position: fixed;
+  bottom: 29px;
+  left: 0;
+  right: 0;
+  width: calc(100% - 496px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .player__now-playing {
   color: #eee;
   font-size: 20px;
-  margin-top: 35px;
+  width: 172px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.player__now-playing__album-art {
+  position: fixed;
+  bottom: 17px;
+  height: 56px;
+  width: 56px;
+}
+
+.player__now-playing__track-info {
+  position: fixed;
+  left: 104px;
+  display: flex;
+  flex-wrap: wrap;
+  bottom: 30.5px;
+}
+
+.player__now-playing__track-info__track-name {
+  width: 100%;
+  bottom: 50px;
+  font-size: 14px;
+}
+
+.player__now-playing__track-info__artist-name {
+  width: 100%;
+  font-size: 11px;
+  color: rgba(238, 238, 238, 0.6);
 }
 
 .filter-container {
@@ -172,6 +215,13 @@ button {
 
 .header h1 {
   margin: 0;
+}
+
+.next-button {
+  position: fixed;
+  right: 220px;
+  font-size: 20px;
+  bottom: 35px;
 }
 
 
@@ -213,6 +263,7 @@ button {
 .songs-album-icon {
   margin: 8px;
   width: 100%;
+  overflow: auto;
 }
 
 .songs-album-icon img {

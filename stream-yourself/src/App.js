@@ -148,12 +148,13 @@ class App extends Component {
             {songs.length > 0 &&
             <SongInfo
               song={songs[0]}
+              songEnd={this.onSongEnd}
             />}
             {songs.length > 1 &&
             <button
-              className="top-button  clear-text  random-text  button"
+              className="top-button  clear-text  button"
               onClick={() => this.setState({ songs: songs.slice(0, 1) })}
-            >Clear
+            >Clear Queue
             </button>}
           </div>
           <div className="side-bar side-bar__left">
@@ -184,9 +185,10 @@ class App extends Component {
             }
           </div>
           <div className="side-bar side-bar__right">
-            {songs.length > 0 &&
+            <div className="queue-header"><h2>Queue</h2></div>
+            {songs.length > 1 &&
               <Playlist
-                list={songs}
+                list={songs.slice(1)}
                 onClick={this.onPlaylistClick}
               />
             }
@@ -216,23 +218,26 @@ const AlbumList = ({ list, onClick }) => {
   )
 }
 
-const SongList = ({ list, onSongClick, onAlbumClick }) => {
-  return (
-    <div className="song-list">
-        <div className="songs-album-icon" onClick={onAlbumClick}>
-          <AlbumArt loc={list[0].artLoc} />
-        </div>
-      <section className="songs-list">
-        {list
-          .map((item, index) =>
-          <div className="songs-item" key={item.id}>
-            <a className="song" onClick={e => onSongClick(e, item)}>{index + 1}. {item.title}</a>
+class SongList extends Component {
+  render() {
+    const { list, onSongClick, onAlbumClick } = this.props;
+    return (
+      <div className="song-list">
+          <div className="songs-album-icon" onClick={onAlbumClick}>
+            <AlbumArt loc={list[0].artLoc} />
           </div>
-        )
-        }
-      </section>
-    </div>
-  )
+        <section className="songs-list">
+          {list
+            .map((item, index) =>
+            <div className="songs-item" key={item.id}>
+              <a className="song" onClick={e => onSongClick(e, item)}>{index + 1}. {item.title}</a>
+            </div>
+          )
+          }
+        </section>
+      </div>
+    )
+  }
 }
 
 const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
@@ -258,7 +263,7 @@ const Playlist = ({ list, onClick }) => {
       {list
         .map((item, index) =>
           <li key={item.id}>
-            <a className="song" onClick={e => onClick(e, item)}>{index}. {item.title}</a>
+            <a className="song" onClick={e => onClick(e, item)}>{index + 1}. {item.title}</a>
           </li>
       )
       }
@@ -296,9 +301,17 @@ const SongInfo = ({ song, songEnd }) => {
 
   document.onkeydown = pauseEvent;
   return (
-    <span style={{display: "flex"}}>
-      <button className="top-button  random-text  next-button  button" onClick={songEnd}>{'>'}</button>
-      <span className="player__now-playing">{song.title} - {song.artist} [{song.album}]</span>
+    <span>
+      <button className="top-button  next-button  button" onClick={songEnd}>{'>'}</button>
+      <div className="player__now-playing">
+        <div className="player__now-playing__album-art">
+          <AlbumArt loc={song.artLoc} />
+        </div>
+        <div className="player__now-playing__track-info">
+          <span className="player__now-playing__track-info__track-name">{song.title}</span>
+          <span className="player__now-playing__track-info__artist-name">{song.artist}</span>
+        </div>
+      </div>
     </span>
   )
 };
