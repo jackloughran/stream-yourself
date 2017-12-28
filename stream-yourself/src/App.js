@@ -14,10 +14,8 @@ class App extends Component {
       albums: null,
       songs: [],
       albumSongs: null,
-      playAlbumLink: false,
-      nowPlaying: null,
-      selectedItem: null,
-      selectedItemIndex: 0,
+      selectedArtistIndex: null,
+      selectedAlbumIndex: null,
       error: null,
     }
 
@@ -33,7 +31,16 @@ class App extends Component {
   componentDidMount() {
     fetch('http://138.197.172.114:48001/api/list')
       .then(response => response.json())
-      .then(persistedMusic => this.setState({ persistedMusic, music: persistedMusic }))
+      .then(persistedMusic => {
+        this.setState({
+          persistedMusic,
+          music: persistedMusic,
+          artists: persistedMusic
+          .sort((a, b) => a.artist < b.artist ? -1 : 1)
+          .filter((song, index, array) => (index === 0) || (song.artist !== array[index - 1].artist))
+          .map(item => item.artist),
+        })
+      })
       .catch(error => this.setState({ error }));
     
     document.onkeydown = e => {
@@ -65,47 +72,71 @@ class App extends Component {
           return false;
         }
       } else if (e.keyCode === 13) {
+        // enter
         if (filter === document.activeElement) {
-          const item = this.state.selectedItem
-          if (item) {
-            if (!this.state.albums) {
-              this.onArtistClick(null, item);
-            } else if (!this.state.albumSongs) {
-              this.onAlbumClick(null, item);
-            } else {
-              this.playAlbum();
-            }
+          const { albums, selectedAlbumIndex, albumSongs } = this.state;
+          const album = albums[selectedAlbumIndex];
+          if (!albumSongs) {
+            this.onAlbumClick(null, album);
+          } else {
+            this.playAlbum();
           }
         }
       } else if (e.keyCode === 40) {
+        // down arrow
         if (filter === document.activeElement) {
-          const { selectedItemIndex, music } = this.state;
-          const newIndex = selectedItemIndex + 1;
-          const selectedItem = music[selectedItemIndex];
-          console.log(selectedItem)
-          this.setState({ selectedItem, selectedItemIndex: newIndex });
+          const { selectedArtistIndex, artists } = this.state;
+          if (artists.length > selectedArtistIndex + 1) {
+            const newIndex = selectedArtistIndex + 1;
+            this.setState({ selectedArtistIndex: newIndex, selectedAlbumIndex: 0 });
+            this.onArtistClick(null, artists[newIndex]);
+          }
+        }
+      } else if (e.keyCode === 38) {
+        // up arrow
+        if (filter === document.activeElement) {
+          const { selectedArtistIndex, artists } = this.state;
+          if (selectedArtistIndex > 0) {
+            const newIndex = selectedArtistIndex - 1;
+            this.setState({ selectedArtistIndex: newIndex, selectedAlbumIndex: 0 });
+            this.onArtistClick(null, artists[newIndex]);
+          }
         }
       } else if (e.keyCode === 27) {
         if (filter === document.activeElement) {
           filter.blur();
         }
+      } else if (e.keyCode === 39) {
+        // right arrow
+        if (filter === document.activeElement) {
+          const { selectedAlbumIndex, albums } = this.state;
+          if (albums.length > selectedAlbumIndex + 1) {
+            const newIndex = selectedAlbumIndex + 1;
+            this.setState({ selectedAlbumIndex: newIndex });
+          }
+        }
+      } else if (e.keyCode === 37) {
+        // left arrow
+        if (filter === document.activeElement) {
+          const { selectedAlbumIndex } = this.state;
+          if (selectedAlbumIndex > 0) {
+            const newIndex = selectedAlbumIndex - 1;
+            this.setState({ selectedAlbumIndex: newIndex});
+          }
+        }
       }
     }
   }
 
-  onArtistClick(event, item) {
+  onArtistClick(event, artist) {
     const { music } = this.state;
-
-    const artist = item.artist;
 
     const albums = music
       .filter(song => song.artist === artist)
       .sort((a, b) => a.album < b.album ? -1 : 1)
       .filter((song, index, array) => (index === 0) || (song.album !== array[index - 1].album));
 
-    window.scrollTo(0, 0);
-
-    this.setState({ albums, playAlbumLink: false, albumSongs: null });
+    this.setState({ albums, albumSongs: null });
   }
 
   onAlbumClick(event, item) {
@@ -177,15 +208,24 @@ class App extends Component {
   onSearch(event) {
     const { persistedMusic } = this.state;
     const searchTerm = event.target.value;
-    const music = persistedMusic
-    .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase())
-                 || item.album.toLowerCase().includes(searchTerm.toLowerCase()));
-    const selectedItem = music[0];
-    this.setState({ music, selectedItem, selectedItemIndex: 0 });
+    const artists = persistedMusic
+    .filter(item => item.artist.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => a.artist < b.artist ? -1 : 1)
+    .filter((song, index, array) => (index === 0) || (song.artist !== array[index - 1].artist))
+    .map(item => item.artist);
+
+    if (artists.length > 0) {
+      this.onArtistClick(null, artists[0]);
+    }
+    if (searchTerm === '') {
+      this.setState({ artists, selectedArtistIndex: null, selectedAlbumIndex: null, albums: null });
+    } else {
+      this.setState({ artists, selectedArtistIndex: 0, selectedAlbumIndex: 0, albumSongs: null });
+    }
   }
 
   render() {
-    const { music, albums, albumSongs, songs } = this.state;
+    const { music, albums, albumSongs, songs, artists, selectedArtistIndex, selectedAlbumIndex } = this.state;
 
     if (!music) {
       return (
@@ -218,12 +258,10 @@ class App extends Component {
           <div className="side-bar side-bar__left">
             <div className="side-bar__artists">
               <MusicTable
-                list={music
-                  .sort((a, b) => a.artist < b.artist ? -1 : 1)
-                  .filter((song, index, array) => (index === 0) || (song.artist !== array[index - 1].artist))
-                }
+                list={artists}
                 objectKey="artist"
                 onClick={this.onArtistClick}
+                selectedIndex={selectedArtistIndex}
               />
             </div>
           </div>
@@ -232,6 +270,7 @@ class App extends Component {
               <AlbumList
                 list={albums}
                 onClick={this.onAlbumClick}
+                selectedIndex={selectedAlbumIndex}
               />
             }
             {albumSongs &&
@@ -260,12 +299,12 @@ class App extends Component {
   }
 }
 
-const AlbumList = ({ list, onClick }) => {
+const AlbumList = ({ list, onClick, selectedIndex }) => {
   return (
     <div className="album-list">
       {list
         .map((item, index) =>
-          <div className="album-icon" onClick={e => onClick(e, item)} key={item.id}>
+          <div className={selectedIndex === index ? "album-icon  selected-item" : "album-icon"} onClick={e => onClick(e, item)} key={item.id}>
             <AlbumArt loc={item.artLoc} />
             <div className="album-name-container">
               <a className="album-name">{item.album}</a>
@@ -304,15 +343,15 @@ class SongList extends Component {
   }
 }
 
-const MusicTable = ({ list, listClassName, onClick, objectKey }) => {
+const MusicTable = ({ list, listClassName, onClick, selectedIndex }) => {
   return (
     <ul className="music-list">
       {list
       .map((item, index) =>
-        <li key={item.id}>
+        <li key={item}>
           <MusicItem
-            className={index === 0 ? "list-button__top" : "list-button_non-top"}
-            item={item[objectKey]}
+            className={index === selectedIndex ? "selected-item" : ""}
+            item={item}
             onClick={e => onClick(e, item)}
           />
         </li>
@@ -338,7 +377,7 @@ const Playlist = ({ list, onClick }) => {
 const Search = ({ onChange }) =>
   <input
     type="search"
-    placeholder="filter"
+    placeholder="filter artists"
     className="filter"
     onClick={() => document.getElementById('filter').select()}
     id="filter"
