@@ -114,6 +114,7 @@ class App extends Component {
             const newIndex = selectedAlbumIndex + 1;
             this.setState({ selectedAlbumIndex: newIndex });
           }
+          return false;
         }
       } else if (e.keyCode === 37) {
         // left arrow
@@ -124,6 +125,7 @@ class App extends Component {
             this.setState({ selectedAlbumIndex: newIndex});
           }
         }
+        return false;
       }
     }
   }
@@ -414,11 +416,11 @@ const Player = ({ songEnd }) =>
     controls>Get a modern browser!</audio>
 
 const AlbumArt = ({ loc }) =>
-  <img
-    src={loc}
-    className="album-art"
-    alt="album art"
-  />
+    <div
+      style={{ backgroundImage: `url(${loc})` }}
+      className="album-art"
+      alt="album art"
+    ></div>
 
 function addSong(song) {
   const player = document.getElementById('player');
