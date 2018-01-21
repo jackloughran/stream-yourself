@@ -21,3 +21,13 @@
 2. Run backend
 3. Install frontend *(this)*
 4. Serve frontend
+
+## Bugs
+
+- album selection page second row doesn't scroll
+- album art sometimes is pulled from other photos in the same directory
+- album art sometimes repeats itself
+- song name in corner doesn't wrap
+- no way to upload your own art
+- no way to go back to album selection page
+- browser back doesnt work 

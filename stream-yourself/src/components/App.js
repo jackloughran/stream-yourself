@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import LoadingIcon from './Rolling.svg';
+import LoadingIcon from '../Rolling.svg';
 import './App.css';
+
+import AlbumList from './AlbumList';
+import AlbumArt from './AlbumArt';
 
 class App extends Component {
 
@@ -301,22 +304,6 @@ class App extends Component {
   }
 }
 
-const AlbumList = ({ list, onClick, selectedIndex }) => {
-  return (
-    <div className="album-list">
-      {list
-        .map((item, index) =>
-          <div className={selectedIndex === index ? "album-icon  selected-item" : "album-icon"} onClick={e => onClick(e, item)} key={item.id}>
-            <AlbumArt loc={item.artLoc} />
-            <div className="album-name-container">
-              <a className="album-name">{item.album}</a>
-            </div>
-          </div>
-        )}
-     </div>
-  )
-}
-
 class SongList extends Component {
   render() {
     const { list, onSongClick, onAlbumClick } = this.props;
@@ -414,13 +401,6 @@ const Player = ({ songEnd }) =>
     onEnded={songEnd}
     autoPlay
     controls>Get a modern browser!</audio>
-
-const AlbumArt = ({ loc }) =>
-    <div
-      style={{ backgroundImage: `url(${loc})` }}
-      className="album-art"
-      alt="album art"
-    ></div>
 
 function addSong(song) {
   const player = document.getElementById('player');

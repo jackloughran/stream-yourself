@@ -235,14 +235,15 @@ button:hover {
 
 .album-icon {
   cursor: pointer;
-  padding: 8px;
+  padding: 20px;
   display: flex;
   flex-wrap: wrap;
 }
 
 .album-art {
+  height: 100%;
   width: 100%;
-  background-size: cover;
+  background-size: contain;
   background-position: 50%;
   background-repeat: no-repeat;
 }
@@ -252,12 +253,15 @@ button:hover {
 }
 
 .album-name-container {
+  text-align: center;
+  width: 100%;
+  padding-top: 5px;
 }
 
 .album-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 240px;
+  grid-template-rows: 1fr 1fr 1fr;
   width: 100%;
 }
 
